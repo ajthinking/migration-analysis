@@ -1,24 +1,23 @@
-# github-selective-scraper
+# migration-analysis
 
-Scrape subsets of github repositories. Warning - this is a work in progress.
+How are Laravels migration files used by web developers? This repository investigates 300K migrations to answer that question.
 
 ## Installation
 First, make sure you have anaconda installed. Then
 ```
-git clone git@github.com:ajthinking/github-selective-scraper.git
-cd github-selective-scraper
+git clone git@github.com:ajthinking/migration-analysis.git
+cd migration-analysis
 conda env create
-conda activate github-selective-scraper
-source activate
-python src/examples/migration-analysis/01_scrape.py
+conda activate migration-analysis
+````
+get data using github.comajthinking/github-selective-scraper
+````
+python src/examples/migration-analysis/01_transform.py
 ```
 
 ## Todo
-- [ ] Parametirize the query string
-- [ ] Fix try-except blocks to throw real errors
-
-## Disclaimer
-Please note to only use this repository in agreement with github API terms of service (scraping only ok for educational purposes).
+- [ ] Installation instructions not working
+- [ ] Instructions on how to use github-selective-scraper
 
 ## License
 MIT
