@@ -2,20 +2,40 @@ import json
 from pprint import pprint
 import random
 import numpy as np
+import pandas as pd
 import csv
 import sys
 import os
-
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
-from Print import Print #pylint: disable=E0401
-
-print = Print()
-
 import matplotlib.pyplot as plt; plt.rcdefaults()
- 
+import Paths
+from Print import Print #pylint: disable=E0401
+print = Print()
 
 np.random.seed(1337)
 
+# Clean the data
+# List all files types
+# find . -type f | sed 's/.*\.//' | sort | uniq -c
+# delete everything but json and php
+# find temp4 -type f ! -name '*.php' ! -name '*.json'  -print0 | xargs -0 rm -vf
+
+df = pd.read_csv(
+        os.path.join(Paths.processed, 'migrations_metadata.csv')
+)
+
+print(df.shape)
+
+plt.bar(["files"], df.size, align='center', alpha=0.5)
+plt.ylabel('Usage')
+plt.title('Data type')
+ 
+plt.show()
+
+
+print(df.head())
+
+print(1337)
+sys.exit()
 # See how high a random algoritm work for estimating the datatype
 
 # 1: get all unique values from the data
