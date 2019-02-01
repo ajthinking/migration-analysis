@@ -21,7 +21,7 @@ def files():
 def transform(migration_files):
     rows = []
     for index, migration_file in enumerate(migration_files):
-        #print.info("Processing file", index)
+        print.info("Processing file", index)
         for column_data_type, column_name in migration_file.column_definitions:
             rows.append((
                     migration_file.user,
@@ -32,6 +32,9 @@ def transform(migration_files):
                     column_data_type,
             ))
     return rows
+
+
+
 
 rows = transform(files())
 

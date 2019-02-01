@@ -55,17 +55,19 @@ class MigrationFile(object):
                 self.content
         )
 
-        if len(data_types) != len(names):
-            return []        
-
-        return zip(data_types, names)
-
+        combined = re.findall(
+                self.regex_for_column,
+                self.content
+        )
+        
+        return combined
 
     def regex_for(self, type):
         expressions = {
             "table": r"(?:Schema::create\(')(.*)(?:')",
             "column_data_type": r"(?:\$table->)([a-zA-Z1-9_]*)",
             "column_name": r"(?:\$table->)(?:[a-z_A-Z]*)\('([a-zA-Z1-9_]*)",
+            "column": r"(?:\$table->)([a-z_A-Z]*)\('?([a-zA-Z1-9_]*)"
         }
         return expressions[type]
 
