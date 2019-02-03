@@ -23,18 +23,33 @@ df = pd.read_csv(
         os.path.join(Paths.processed, 'migrations_metadata.csv')
 )
 
-print(df.shape)
+# COUNT
+#plt.bar([""], df.shape[0], align='center', alpha=0.5)
+#plt.ylabel('Number of columns')
+#plt.title('')
+#plt.show()
 
-plt.bar(["files"], df.size, align='center', alpha=0.5)
-plt.ylabel('Usage')
-plt.title('Data type')
- 
+# Users
+#plt.bar(["users"], df.drop_duplicates(subset=["user"]).shape[0], align='center', alpha=0.5)
+#plt.ylabel('Number of users represented')
+#plt.title('')
+#plt.show()
+
+# Most common tables
+df = df.drop(["id"], axis=1)
+
+most_common = df['table'].value_counts().head(20)
+
+print(most_common.index.tolist())
+#sys.exit()
+
+plt.bar(most_common.index.tolist(), most_common.values, align='center', alpha=0.5)
+plt.xticks(most_common.index.tolist(), most_common.index.tolist(), rotation=80)
+plt.ylabel('Common tables')
+plt.title('')
+plt.subplots_adjust(bottom=0.35)
 plt.show()
 
-
-print(df.head())
-
-print(1337)
 sys.exit()
 # See how high a random algoritm work for estimating the datatype
 
