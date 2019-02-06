@@ -20,7 +20,7 @@ def tensor_to_string(tensor):
 class MigrationsDataset(data.Dataset):
     def __init__(self, train=False, test=False, transform=None, target_transform=None, download=False):
         data = []    
-        with open(r"/Users/anders/Code/github-scrape-laravel/data/processed/migration-analysis-data.csv", 'r', encoding='utf-8-sig') as f:
+        with open(r"/Users/anders/Code/migration-analysis/data/processed/migrations_metadata.csv", 'r', encoding='utf-8-sig') as f:
             reader = csv.reader(f)
             headers = next(reader, None)
             for row in reader:
@@ -45,7 +45,7 @@ class MigrationsDataset(data.Dataset):
             migrations = []
 
         self.datatypes = np.unique(
-            list(map(lambda migration: migration['datatype'], migrations_train))
+            list(map(lambda migration: migration['column_data_type'], migrations_train))
         )        
 
         tensor_input_data = []
@@ -55,10 +55,10 @@ class MigrationsDataset(data.Dataset):
 
         for index, migration in enumerate(migrations):
             tensor_input_data.append(
-                list(map(lambda word: float(word in migration['name']), self.global_word_bins))
+                list(map(lambda word: float(word in migration['column_name']), self.global_word_bins))
             )
             
-            tensor_output_data.append(list(map(lambda datatype: float(datatype == migration['datatype']), self.datatypes)))
+            tensor_output_data.append(list(map(lambda datatype: float(datatype == migration['column_data_type']), self.datatypes)))
         
         self.x = Variable(torch.tensor(tensor_input_data, dtype=torch.float))
         self.y = Variable(torch.tensor(tensor_output_data, dtype=torch.float))
@@ -75,13 +75,13 @@ class MigrationsDataset(data.Dataset):
         return self.global_word_bins[index]            
 
     def get_local_word_bins(self, migration):
-        return migration['name'].split()    
+        return migration['column_name'].split()    
 
     def get_global_word_bins(self, migrations):
         return np.unique(list(
                 
                 map(
-                        lambda migration: migration['name'],
+                        lambda migration: migration['column_name'],
                         migrations
                 )
         ))
@@ -174,14 +174,14 @@ for i, data in enumerate(test_loader):
     # )
 
 
-    print(
-            "prediction for",
-            test_loader.dataset.input_tensor_to_text(inputs),
-            ":", 
-            test_loader.dataset.output_tensor_to_text(prediction),
-            "actual",
-            test_loader.dataset.output_tensor_to_text(actual)
-    )
+    # print(
+    #         "prediction for",
+    #         test_loader.dataset.input_tensor_to_text(inputs),
+    #         ":", 
+    #         test_loader.dataset.output_tensor_to_text(prediction),
+    #         "actual",
+    #         test_loader.dataset.output_tensor_to_text(actual)
+    # )
 
     if(test_loader.dataset.output_tensor_to_text(prediction) == test_loader.dataset.output_tensor_to_text(actual)):
         successes += 1
