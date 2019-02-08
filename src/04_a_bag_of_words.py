@@ -11,6 +11,18 @@ import torch.utils.data as data
 import time
 import operator
 
+from BaseDataset import BaseDataset
+
+train_loader = DataLoader(
+    dataset=BaseDataset(path=r"/Users/anders/Code/migration-analysis/data/processed/migrations_metadata.csv"),
+    batch_size=1000,
+    shuffle=False,
+    num_workers=2
+)
+
+
+sys.exit()
+
 def tensor_to_string(tensor):
     result = ''
     for i, v in enumerate(tensor[0]):
@@ -28,14 +40,10 @@ class MigrationsDataset(data.Dataset):
                 for index, col in enumerate(row):
                     my_obj[headers[index]] = col
                 data.append(my_obj)
-            f.close() # Desperate bug hunt. The file should close after the end of the with open(...) block anyways
-        #np.random.seed(1337)
-        #np.random.shuffle(data)
         split_point1 = int(np.floor(len(data)*0.9))
         split_point2 = int(np.floor(len(data)*1.0))
         migrations_train = data[0:split_point1]
         migrations_test = data[split_point1:split_point2]
-        #migrations_ditched = data[split_point2:]
 
         if(train):
             migrations = migrations_train
