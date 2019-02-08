@@ -34,17 +34,6 @@ test_loader = DataLoader(
     shuffle=False,
     num_workers=2)    
 
-
-print(
-    # test_loader.dataset.x[0]
-    test_loader.dataset.bow_column_name.tensor_to_text(
-        test_loader.dataset.x[0]
-    )
-)
-
-sys.exit()
-
-
 network = Network(
     number_of_inputs = migration_train_dataset.x.size()[1],
     number_of_outputs = migration_train_dataset.y.size()[1]
@@ -59,7 +48,7 @@ criterion = nn.MSELoss()
 optimizer = optim.SGD(network.parameters(), lr=1.0)
 
 # training loop
-for epoch in range(100):
+for epoch in range(10):
     print("Training epoch", epoch)
     for i, data in enumerate(train_loader):
         # get the inputs
@@ -85,36 +74,10 @@ for i, data in enumerate(test_loader):
     inputs, output = data
     prediction = network(inputs).data 
     actual = output
-    inputs_index, inputs_value = max(enumerate(inputs), key=operator.itemgetter(1))
-    prediction_index, prediction_value = max(enumerate(actual), key=operator.itemgetter(1))
-    
-
-    # print(
-    #     inputs_index,
-    #     train_loader.dataset.input_tensor_to_text(inputs),
-    #     inputs,
-    #     prediction_index,
-    #     train_loader.dataset.output_tensor_to_text(actual),
-    #     actual
-    # )
-
-
-    # print(
-    #         "prediction for",
-    #         test_loader.dataset.input_tensor_to_text(inputs),
-    #         ":", 
-    #         test_loader.dataset.output_tensor_to_text(prediction),
-    #         "actual",
-    #         test_loader.dataset.output_tensor_to_text(actual)
-    # )
 
     if(test_loader.dataset.bow_column_name.tensor_to_text(prediction) == test_loader.dataset.bow_column_name.tensor_to_text(actual)):
         successes += 1
     else:
         fails += 1
-    # print(prediction)
-    # print(actual)
-    # print("--------")
 
-
-# print("Summary successes", successes, "/", successes + fails)
+print("Summary successes", successes, "/", successes + fails)

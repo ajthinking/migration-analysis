@@ -32,13 +32,7 @@ class BagOfWords(object):
         return list(map(lambda bag_word: float(text == bag_word), self.bags))
 
     def tensor_to_text(self, tensor):
-        print(
-            max(tensor)
-        )
-
-        sys.exit()
-
-        #CONTINIUE HERE!!!!
-
-        index, value = max(enumerate(tensor[0]), key=operator.itemgetter(1))
-        return self.words[index]                    
+        values, indices = tensor.max(0)
+        print(indices)
+        print(values)
+        return self.words.values[indices.item()]                    
