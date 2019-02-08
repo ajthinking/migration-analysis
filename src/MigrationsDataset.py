@@ -42,16 +42,22 @@ class MigrationsDataset(data.Dataset):
             data = data_test
         else:
             data = []  
-
-        self.datatypes = data.column_data_type.unique()        
-        self.global_word_bins = data_train.column_data_type.unique()        
+    
+        self.global_word_bins = data_train.column_name.unique()        
 
         tensor_input_data = list(map(
-            lambda item: list(map(lambda word: word in [item], self.global_word_bins)), data.column_data_type.values
+            lambda item: list(map(lambda word: int(word in [item]), self.global_word_bins)), data.column_name.values
         ))
+        
+        tensor_output_data = data.column_data_type.values
+
+        print(tensor_input_data)
+        print(tensor_output_data)
+        # next convert output data to indices in the global word bins :)
+        sys.exit()
 
         for index, data in enumerate(data):
-            tensor_output_data.append(list(map(lambda datatype: float(datatype == data['column_data_type']), self.datatypes)))
+            pass#tensor_output_data.append(list(map(lambda datatype: float(datatype == data['column_data_type']), self.datatypes)))
 
         self.x = Variable(torch.tensor(tensor_input_data, dtype=torch.float))
         self.y = Variable(torch.tensor(tensor_output_data, dtype=torch.float))
