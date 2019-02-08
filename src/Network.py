@@ -12,18 +12,16 @@ import time
 import operator
 
 class Network(nn.Module):
-    def __init__(self):
+    def __init__(self, number_of_inputs, number_of_outputs):
         super(Network, self).__init__()
 
-        migrationsDataset = MigrationsDataset()
-        
-        self.l1 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.global_word_bins))
-        self.l2 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.global_word_bins))
-        self.l3 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.datatypes))
+        self.l1 = nn.Linear(number_of_inputs, number_of_inputs)
+        self.l2 = nn.Linear(number_of_inputs, number_of_inputs)
+        self.l3 = nn.Linear(number_of_inputs, number_of_outputs)
         self.sigmoid = nn.Sigmoid()
         
     def forward(self, x):
         out1 = self.l1(x)
         out2 = self.l2(out1)
-        y_pred = self.l3(out2)        
+        y_pred = self.sigmoid(self.l3(out2))
         return y_pred

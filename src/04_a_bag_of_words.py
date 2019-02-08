@@ -20,18 +20,37 @@ def tensor_to_string(tensor):
         result += str(round(1000*v.item())) + " "
     return result
 
+migration_train_dataset = MigrationsDataset(train=True, limit_rows=1000)
+migration_test_dataset = MigrationsDataset(test=True, limit_rows=1000)
+
 train_loader = DataLoader(
-    dataset=MigrationsDataset(train=True, limit_rows=1000),
+    dataset=migration_train_dataset,
     batch_size=1000,
     shuffle=False,
     num_workers=2)
 
 test_loader = DataLoader(
-    dataset=MigrationsDataset(test=True, limit_rows=1000),
+    dataset=migration_test_dataset,
     shuffle=False,
     num_workers=2)    
 
-network = Network()
+
+print(
+    # test_loader.dataset.x[0]
+    test_loader.dataset.bow_column_name.tensor_to_text(
+        test_loader.dataset.x[0]
+    )
+)
+
+sys.exit()
+
+
+network = Network(
+    number_of_inputs = migration_train_dataset.x.size()[1],
+    number_of_outputs = migration_train_dataset.y.size()[1]
+)
+
+#sys.exit()
 
 # Mean Square Error Loss
 criterion = nn.MSELoss()
@@ -52,7 +71,6 @@ for epoch in range(100):
         y_pred = network(inputs)
         # Compute and print loss
         loss = criterion(y_pred, output)
-
         # Zero gradients, perform a backward pass, and update the weights.
         optimizer.zero_grad()
         loss.backward()
@@ -90,9 +108,13 @@ for i, data in enumerate(test_loader):
     #         test_loader.dataset.output_tensor_to_text(actual)
     # )
 
-    if(test_loader.dataset.output_tensor_to_text(prediction) == test_loader.dataset.output_tensor_to_text(actual)):
+    if(test_loader.dataset.bow_column_name.tensor_to_text(prediction) == test_loader.dataset.bow_column_name.tensor_to_text(actual)):
         successes += 1
     else:
         fails += 1
+    # print(prediction)
+    # print(actual)
+    # print("--------")
 
-print("Summary successes", successes, "/", successes + fails)
+
+# print("Summary successes", successes, "/", successes + fails)

@@ -13,6 +13,7 @@ import time
 import operator
 
 from BaseDataset import BaseDataset
+from BagOfWords import BagOfWords
 
 class MigrationsDataset(data.Dataset):
     def __init__(
@@ -35,32 +36,18 @@ class MigrationsDataset(data.Dataset):
         data_train = data[0:split_point1]
         data_test = data[split_point1:]
 
-
         if(train):
             data = data_train
         elif(test):
             data = data_test
         else:
             data = []  
-    
-        self.global_word_bins = data_train.column_name.unique()        
 
-        tensor_input_data = list(map(
-            lambda item: list(map(lambda word: int(word in [item]), self.global_word_bins)), data.column_name.values
-        ))
-        
-        tensor_output_data = data.column_data_type.values
+        self.bow_column_name = BagOfWords(data_train.column_name)
+        self.bow_column_data_type = BagOfWords(data_train.column_data_type)
 
-        print(tensor_input_data)
-        print(tensor_output_data)
-        # next convert output data to indices in the global word bins :)
-        sys.exit()
-
-        for index, data in enumerate(data):
-            pass#tensor_output_data.append(list(map(lambda datatype: float(datatype == data['column_data_type']), self.datatypes)))
-
-        self.x = Variable(torch.tensor(tensor_input_data, dtype=torch.float))
-        self.y = Variable(torch.tensor(tensor_output_data, dtype=torch.float))
+        self.x = Variable(torch.tensor(self.bow_column_name.tensors, dtype=torch.float))
+        self.y = Variable(torch.tensor(self.bow_column_data_type.tensors, dtype=torch.float))
 
     def get_datatypes(self):
         return self.datatypes
@@ -72,6 +59,9 @@ class MigrationsDataset(data.Dataset):
     def input_tensor_to_text(self, input_tensor):
         index, value = max(enumerate(input_tensor[0]), key=operator.itemgetter(1))
         return self.global_word_bins[index]            
+
+    def text_to_output_tensor(self, word):
+        return list(map(lambda item: float(word in [item]), self.global_word_bins))
 
     def get_local_word_bins(self, migration):
         return migration['column_name'].split()    
