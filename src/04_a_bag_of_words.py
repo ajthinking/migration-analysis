@@ -11,17 +11,8 @@ import torch.utils.data as data
 import time
 import operator
 
-from BaseDataset import BaseDataset
-
-train_loader = DataLoader(
-    dataset=BaseDataset(path=r"/Users/anders/Code/migration-analysis/data/processed/migrations_metadata.csv"),
-    batch_size=1000,
-    shuffle=False,
-    num_workers=2
-)
-
-
-sys.exit()
+from Network import Network
+from MigrationsDataset import MigrationsDataset
 
 def tensor_to_string(tensor):
     result = ''
@@ -29,109 +20,17 @@ def tensor_to_string(tensor):
         result += str(round(1000*v.item())) + " "
     return result
 
-class MigrationsDataset(data.Dataset):
-    def __init__(self, train=False, test=False, transform=None, target_transform=None, download=False):
-        data = []    
-        with open(r"/Users/anders/Code/migration-analysis/data/processed/migrations_metadata.csv", 'r', encoding='utf-8-sig') as f:
-            reader = csv.reader(f)
-            headers = next(reader, None)
-            for row in reader:
-                my_obj = {}
-                for index, col in enumerate(row):
-                    my_obj[headers[index]] = col
-                data.append(my_obj)
-        split_point1 = int(np.floor(len(data)*0.9))
-        split_point2 = int(np.floor(len(data)*1.0))
-        migrations_train = data[0:split_point1]
-        migrations_test = data[split_point1:split_point2]
-
-        if(train):
-            migrations = migrations_train
-        elif(test):
-            migrations = migrations_test
-        else:
-            migrations = []
-
-        self.datatypes = np.unique(
-            list(map(lambda migration: migration['column_data_type'], migrations_train))
-        )        
-
-        tensor_input_data = []
-        tensor_output_data = []
-
-        self.global_word_bins = self.get_global_word_bins(migrations_train)
-
-        for index, migration in enumerate(migrations):
-            tensor_input_data.append(
-                list(map(lambda word: float(word in migration['column_name']), self.global_word_bins))
-            )
-            
-            tensor_output_data.append(list(map(lambda datatype: float(datatype == migration['column_data_type']), self.datatypes)))
-        
-        self.x = Variable(torch.tensor(tensor_input_data, dtype=torch.float))
-        self.y = Variable(torch.tensor(tensor_output_data, dtype=torch.float))
-
-    def get_datatypes(self):
-        return self.datatypes
-
-    def output_tensor_to_text(self, output_tensor):
-        index, value = max(enumerate(output_tensor[0]), key=operator.itemgetter(1))
-        return self.datatypes[index]
-
-    def input_tensor_to_text(self, input_tensor):
-        index, value = max(enumerate(input_tensor[0]), key=operator.itemgetter(1))
-        return self.global_word_bins[index]            
-
-    def get_local_word_bins(self, migration):
-        return migration['column_name'].split()    
-
-    def get_global_word_bins(self, migrations):
-        return np.unique(list(
-                
-                map(
-                        lambda migration: migration['column_name'],
-                        migrations
-                )
-        ))
-
-    def __getitem__(self, index):
-        return self.x[index], self.y[index]
-
-    def __len__(self):
-        return len(self.x)
-
-class Network(nn.Module):
-    def __init__(self):
-        super(Network, self).__init__()
-
-        migrationsDataset = MigrationsDataset()
-        
-        self.l1 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.global_word_bins))
-        self.l2 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.global_word_bins))
-        self.l3 = nn.Linear(len(migrationsDataset.global_word_bins), len(migrationsDataset.datatypes))
-        self.sigmoid = nn.Sigmoid()
-        
-    def forward(self, x):
-        out1 = self.l1(x)
-        out2 = self.l2(out1)
-        y_pred = self.l3(out2)        
-        return y_pred
-
-
 train_loader = DataLoader(
-    dataset=MigrationsDataset(train=True),
+    dataset=MigrationsDataset(train=True, limit_rows=1000),
     batch_size=1000,
     shuffle=False,
     num_workers=2)
 
 test_loader = DataLoader(
-    dataset=MigrationsDataset(test=True),
+    dataset=MigrationsDataset(test=True, limit_rows=1000),
     shuffle=False,
     num_workers=2)    
 
-#sys.exit()
-
-# our model
 network = Network()
 
 # Mean Square Error Loss

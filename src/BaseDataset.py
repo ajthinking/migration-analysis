@@ -15,10 +15,9 @@ import operator
 class BaseDataset(data.Dataset):
     def __init__(
             self,
-            path,
             train=False,
             test=False,
-            limit_rows=1000,
+            limit_rows=False,
             transform=None,
             target_transform=None,
             download=False
@@ -35,6 +34,8 @@ class BaseDataset(data.Dataset):
 
         print(len(data_train))
         print(len(data_test))
+
+        print(data_test)
 
     def __getitem__(self, index):
         return self.x[index], self.y[index]
