@@ -17,6 +17,14 @@ print = Print()
 from Network import Network
 from MigrationsDataset import MigrationsDataset
 
+# SAMPLE DATA
+# id,user,repo,filename,table,column_name,column_data_type
+# 0,ahmadeyamin,laravel-blog-relation,2014_10_12_100000_create_password_resets_table.php,password_resets,email,string
+# 1,ahmadeyamin,laravel-blog-relation,2014_10_12_100000_create_password_resets_table.php,password_resets,token,string
+# 2,ahmadeyamin,laravel-blog-relation,2014_10_12_100000_create_password_resets_table.php,password_resets,created_at,timestamp
+# 3,ahmadeyamin,laravel-blog-relation,2018_06_29_113550_create_tags_table.php,tags,id,increments
+# 4,ahmadeyamin,laravel-blog-relation,2018_06_29_113550_create_tags_table.php,tags,name,string
+
 migration_train_dataset = MigrationsDataset(train=True, limit_rows=10000)
 migration_test_dataset = MigrationsDataset(test=True, limit_rows=10000)
 
@@ -43,7 +51,8 @@ criterion = nn.MSELoss()
 optimizer = optim.SGD(network.parameters(), lr=1.00)
 
 # training loop
-for epoch in range(1000):
+for epoch in range(300):
+    print("Training epoch", epoch)
     for i, data in enumerate(train_loader):
         # get the inputs
         inputs, output = data
@@ -54,7 +63,7 @@ for epoch in range(1000):
         y_pred = network(inputs)
         # Compute and print loss
         loss = criterion(y_pred, output)
-        print("Training epoch", epoch, "loss =", loss)
+        
         # Zero gradients, perform a backward pass, and update the weights.
         optimizer.zero_grad()
         loss.backward()
