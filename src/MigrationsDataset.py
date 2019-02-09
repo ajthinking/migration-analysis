@@ -36,18 +36,17 @@ class MigrationsDataset(data.Dataset):
         data_train = data[0:split_point1]
         data_test = data[split_point1:]
 
-        if(train):
-            data = data_train
-        elif(test):
-            data = data_test
-        else:
-            data = []  
-
         self.bow_column_name = BagOfWords(data_train.column_name)
         self.bow_column_data_type = BagOfWords(data_train.column_data_type)
 
-        self.x = Variable(torch.tensor(self.bow_column_name.tensors, dtype=torch.float))
-        self.y = Variable(torch.tensor(self.bow_column_data_type.tensors, dtype=torch.float))
+        if(train):
+            self.x = Variable(torch.tensor(self.bow_column_name.tensors, dtype=torch.float))
+            self.y = Variable(torch.tensor(self.bow_column_data_type.tensors, dtype=torch.float))
+        elif(test):
+            self.x = Variable(torch.tensor(self.bow_column_name.tensors_for(data_test.column_name), dtype=torch.float))
+            self.y = Variable(torch.tensor(self.bow_column_data_type.tensors_for(data_test.column_data_type), dtype=torch.float))
+        else:
+            data = []  
 
     def get_datatypes(self):
         return self.datatypes
